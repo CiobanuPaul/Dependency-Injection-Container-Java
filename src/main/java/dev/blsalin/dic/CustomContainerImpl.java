@@ -94,8 +94,13 @@ public class CustomContainerImpl implements CustomContainer {
 
     @Override
     public <T> T create(Class<T> type, Map<String, Object> parameters) {
-        Map<String, Object> newInstancesMap = new HashMap<>(instancesMap);
-        newInstancesMap.putAll(parameters);
+        Map<String, Object> newInstancesMap = new HashMap<>(parameters);
+        for (var entry : instancesMap.entrySet()) {
+            if(!newInstancesMap.containsKey(entry.getKey())) {
+                newInstancesMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        newInstancesMap.remove(type.getName());
         try(var newCCI = new CustomContainerImpl(newInstancesMap, functions)) {
             return newCCI.getInstance(type, type.getName());
         }
